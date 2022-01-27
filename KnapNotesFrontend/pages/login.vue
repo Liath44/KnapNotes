@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <v-card :style="cardWidth" elevation="5" outlined shaped class="pa-4">
-      <v-card-title>Welcome to KnapNotes</v-card-title>
+      <v-card-title>Welcome to CornyNotes</v-card-title>
       <v-text-field
         id="login"
         v-model="login"
@@ -55,8 +55,12 @@ export default {
     doLogin () {
       this.$store
         .dispatch('login', { username: this.login.trim(), password: this.password.trim() })
-        .then((response) => { console.log(response) })
-        .catch((error) => { console.log(error) })
+        .then(() => {
+          this.$router.push('/')
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   }
 }

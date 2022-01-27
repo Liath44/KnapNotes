@@ -31,6 +31,10 @@
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
+      <v-spacer />
+      <v-btn icon @click="logout">
+        <v-icon>mdi-logout</v-icon>
+      </v-btn>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -74,7 +78,13 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'KnapNotes'
+      title: 'CornyNotes'
+    }
+  },
+  methods: {
+    logout () {
+      sessionStorage.removeItem('token')
+      this.$router.push('/login')
     }
   }
 }

@@ -15,8 +15,17 @@
         prepend-icon="mdi-key"
         type="password"
       />
+      <v-text-field
+        id="password2"
+        v-model="password2"
+        label="repeat password"
+        prepend-icon="mdi-key"
+        type="password"
+      />
       <div class="buttons-container">
-        <v-btn>register</v-btn>
+        <v-btn @click="doRegister">
+          register
+        </v-btn>
       </div>
     </v-card>
   </div>
@@ -30,6 +39,7 @@ export default {
     return {
       login: '',
       password: '',
+      password2: '',
       widthsForBreakpoints: {
         xs: 90,
         sm: 70,
@@ -44,6 +54,23 @@ export default {
       return {
         width: this.widthsForBreakpoints[this.$vuetify.breakpoint.name] + '%'
       }
+    }
+  },
+  // TODO: Add frontside password/login verification
+  methods: {
+    doRegister () {
+      if (this.password !== this.password2) {
+        console.log('Passwords do not match')
+        return
+      }
+      this.$store
+        .dispatch('register', { username: this.login.trim(), password: this.password.trim() })
+        .then(() => {
+          this.$router.push('/')
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   }
 }

@@ -16,7 +16,7 @@ app.include_router(notes_router)
 app.add_middleware(
 	CORSMiddleware,
 	allow_origins=origins,
-	allow_credentials=False,
+	allow_credentials=True,
 	allow_methods=["*"],
 	allow_headers=["*"],
 	expose_headers=["*"]

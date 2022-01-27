@@ -3,9 +3,20 @@ const getters = {}
 const mutations = {}
 const actions = {
   async login (context, payload) {
-    const response = await this.$axios
-      .$post('login', payload, { headers: { 'Content-Type': 'application/json' } })
-    console.log(response)
+    await this.$axios
+      .post('login', payload)
+      .then((response) => {
+        context.commit('setUserId', response.data.id)
+        sessionStorage.setItem('token', response.headers.token)
+      })
+  },
+  async register (context, payload) {
+    await this.$axios
+      .post('register', payload)
+      .then((response) => {
+        context.commit('setUserId', response.data.id)
+        sessionStorage.setItem('token', response.headers.token)
+      })
   }
 }
 

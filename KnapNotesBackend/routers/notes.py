@@ -45,7 +45,7 @@ async def request_saving_note(saved_note: SavedNote, response: Response, token: 
 	return query_result
 
 
-@router.get("/note/get", tags=[MODULE_TAG], status_code=status.HTTP_200_OK)
+@router.post("/note/get", tags=[MODULE_TAG], status_code=status.HTTP_200_OK)
 async def request_get_note(note: Note, response: Response, token: Optional[List[str]] = Header(None)):
 	owner_id = get_user_id_from_token(token)
 	if not owner_id:
