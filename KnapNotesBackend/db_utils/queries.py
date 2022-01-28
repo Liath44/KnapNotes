@@ -91,7 +91,8 @@ def create_new_note(owner_id, is_encrypted, passphrase):
 		return {
 			"note_id": note_id,
 			"text": text,
-			"is_encrypted": is_encrypted
+			"is_encrypted": is_encrypted,
+			"is_public": False
 		}
 	except SQLAlchemyError as error:
 		exception(error)
@@ -114,7 +115,7 @@ def get_user_id(token):
 def save_note(note_id, user_id, text):
 	session = create_session()
 	try:
-		note_entry = session.query(Note.id, Note.owner_id, Note.text, Note.is_encrypted).filter_by(id=note_id)
+		note_entry = session.query(Note.id, Note.owner_id, Note.text, Note.is_encrypted, Note.is_public).filter_by(id=note_id)
 		note_data = note_entry.first()
 		if note_data is None or not note_data.owner_id == user_id:
 			return False  # invalid user or note_id
@@ -127,7 +128,8 @@ def save_note(note_id, user_id, text):
 			"text": text,
 			"owner_id": note_data.owner_id,
 			"note_id": note_data.id,
-			"is_encrypted": note_data.is_encrypted
+			"is_encrypted": note_data.is_encrypted,
+			"is_public": note_data.is_public
 		}
 	except SQLAlchemyError as error:
 		exception(error)
@@ -140,7 +142,7 @@ def save_note(note_id, user_id, text):
 def get_note(note_id, user_id, passphrase):
 	session = create_session()
 	try:
-		note_entry = session.query(Note.id, Note.owner_id, Note.text, Note.is_encrypted).filter_by(id=note_id)
+		note_entry = session.query(Note.id, Note.owner_id, Note.text, Note.is_encrypted, Note.is_public).filter_by(id=note_id)
 		note_data = note_entry.first()
 		if note_data is None or not note_data.owner_id == user_id:
 			return False  # invalid user or note_id
@@ -161,7 +163,8 @@ def get_note(note_id, user_id, passphrase):
 			"text": text,
 			"owner_id": note_data.owner_id,
 			"note_id": note_data.id,
-			"is_encrypted": note_data.is_encrypted
+			"is_encrypted": note_data.is_encrypted,
+			"is_public": note_data.is_public
 		}
 	except SQLAlchemyError as error:
 		exception(error)
@@ -173,13 +176,50 @@ def get_note(note_id, user_id, passphrase):
 
 def get_all_notes(user_id):
 	session = create_session()
-	notes = session.query(Note.id, Note.owner_id, Note.text, Note.is_encrypted).filter_by(owner_id=user_id).all()
+	notes = session.query(Note.id, Note.owner_id, Note.text, Note.is_encrypted, Note.is_public).filter_by(owner_id=user_id).all()
 	outcome = {MESSAGES_KEY: []}
 	for note_record in notes:
 		outcome[MESSAGES_KEY].append({
 			"note_id": note_record[0],
 			"owner_id": note_record[1],
 			"text": note_record[2],
-			"is_encrypted": note_record[3]
+			"is_encrypted": note_record[3],
+			"is_public": note_record[4]
+		})
+	return outcome
+
+
+def change_privacy_status_of_note(note_id, user_id):
+	session = create_session()
+	try:
+		note_entry = session.query(Note.id, Note.owner_id, Note.is_public, Note.is_encrypted, Note.text).filter_by(id=note_id)
+		note_data = note_entry.first()
+		if note_data is None or not note_data.owner_id == user_id or note_data.is_encrypted:
+			return False  # invalid user or note_id
+		new_status = not note_data.is_public
+		session.query(Note).filter(Note.id == note_id).update({"is_public": new_status})
+		session.commit()
+		return {
+			"note_id": note_id,
+			"owner_id": user_id,
+			"is_public": new_status,
+			"is_encrypted": note_data.is_encrypted,
+			"text": note_data.text
+		}
+	except SQLAlchemyError as error:
+		exception(error)
+		session.rollback()
+		return False
+	finally:
+		session.close()
+
+
+def query_for_public_notes():
+	session = create_session()
+	notes = session.query(Note.text, Note.is_public).filter_by(is_public=True).all()
+	outcome = {MESSAGES_KEY: []}
+	for note_record in notes:
+		outcome[MESSAGES_KEY].append({
+			"text": note_record[0]
 		})
 	return outcome

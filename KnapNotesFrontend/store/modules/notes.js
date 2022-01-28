@@ -9,7 +9,8 @@ const actions = {
         response.data.messages.forEach((element) => {
           userNotes[element.note_id] = {
             text: element.text,
-            isEncrypted: element.is_encrypted
+            isEncrypted: element.is_encrypted,
+            isPublic: element.is_public
           }
         })
         context.commit('setUserNotes', userNotes)
@@ -34,7 +35,8 @@ const actions = {
           noteId: response.data.note_id,
           data: {
             text: response.data.text,
-            isEncrypted: response.data.is_encrypted
+            isEncrypted: response.data.is_encrypted,
+            isPublic: response.data.is_public
           }
         }
       })

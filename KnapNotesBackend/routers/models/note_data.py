@@ -15,3 +15,7 @@ class SavedNote(BaseModel):
 class Note(BaseModel):
 	note_id: int
 	passphrase: Optional[str] = None
+
+
+class PublicNoteUpdate(BaseModel):
+	note_id: int

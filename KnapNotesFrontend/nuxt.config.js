@@ -1,8 +1,18 @@
+import path from 'path'
+import fs from 'fs'
 import colors from 'vuetify/es5/util/colors'
 
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
+
+  server: {
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'ssl/private.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'ssl/certificate.crt')),
+      passphrase: 'NOPE'
+    }
+  },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -28,6 +38,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '@/plugins/axios'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -49,7 +60,7 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'http://127.0.0.1:8000'
+    baseURL: 'https://127.0.0.1:8000'
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

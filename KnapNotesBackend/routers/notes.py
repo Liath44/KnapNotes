@@ -1,10 +1,10 @@
 from fastapi import APIRouter, status, Response, Header
-from routers.models.note_data import NewNote, SavedNote, Note
+from routers.models.note_data import NewNote, SavedNote, Note, PublicNoteUpdate
 from routers.models.registration_form import validate_password
 from api_utils.response_bodies import INVALID_NOTE_PASSWORD, COULD_NOT_CREATE_NOTE, COULD_NOT_SAVE_NOTE, \
 	COULD_NOT_ACCESS_NOTE, TOKEN_VALIDATION_ERROR
 from api_utils.token_picker import get_user_id_from_token
-from db_utils.queries import create_new_note, save_note, get_note, get_all_notes
+from db_utils.queries import create_new_note, save_note, get_note, get_all_notes, change_privacy_status_of_note
 from typing import List, Optional
 
 MODULE_TAG = "notes"
@@ -65,3 +65,16 @@ async def request_all_notes(response: Response, token: Optional[List[str]] = Hea
 		response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
 		return TOKEN_VALIDATION_ERROR
 	return get_all_notes(owner_id)
+
+
+@router.put("/note/change-privacy", tags=[MODULE_TAG], status_code=status.HTTP_200_OK)
+async def make_note_public_or_private(note: PublicNoteUpdate, response: Response, token: Optional[List[str]] = Header(None)):
+	owner_id = get_user_id_from_token(token)
+	if not owner_id:
+		response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+		return TOKEN_VALIDATION_ERROR
+	query_result = change_privacy_status_of_note(note.note_id, owner_id)
+	if not query_result:
+		response.status_code = status.HTTP_502_BAD_GATEWAY
+		return COULD_NOT_SAVE_NOTE
+	return query_result

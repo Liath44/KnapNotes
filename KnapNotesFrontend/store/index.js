@@ -1,6 +1,7 @@
 import Vuex from 'vuex'
 import authentication from '~/store/modules/authentication'
 import notes from '~/store/modules/notes'
+import publicNotes from '~/store/modules/publicNotes'
 
 const createStore = () => {
   return new Vuex.Store({
@@ -25,6 +26,7 @@ const createStore = () => {
     },
     modules: {
       authentication,
+      publicNotes,
       notes
     }
   })

@@ -70,9 +70,14 @@ export default {
       fixed: false,
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
+          icon: 'mdi-note-multiple',
+          title: 'My notes',
           to: '/'
+        },
+        {
+          icon: 'mdi-earth',
+          title: 'Public notes',
+          to: '/public-notes'
         }
       ],
       miniVariant: false,

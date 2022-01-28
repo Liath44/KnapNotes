@@ -4,7 +4,7 @@ const mutations = {}
 const actions = {
   async login (context, payload) {
     await this.$axios
-      .post('login', payload)
+      .post('login', payload, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
         context.commit('setUserId', response.data.id)
         sessionStorage.setItem('token', response.headers.token)

@@ -46,6 +46,9 @@
           <v-btn @click="editor = false">
             exit
           </v-btn>
+          <v-btn v-if="currentNoteId ? !userNotes[currentNoteId].isEncrypted : false" @click="swapPrivacyStatusOfNote">
+            {{ userNotes[currentNoteId].isPublic ? "make private" : "make public" }}
+          </v-btn>
           <v-btn @click="performSave">
             save
           </v-btn>
@@ -190,6 +193,15 @@ export default {
         .then((newNote) => {
           this.userNotes[newNote.noteId] = newNote.data
           this.noteCreator = false
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    async swapPrivacyStatusOfNote () {
+      await this.$store.dispatch('swapPrivacyStatusOfNote', { note_id: this.currentNoteId })
+        .then((updatedNote) => {
+          this.userNotes[updatedNote.noteId] = updatedNote.data
         })
         .catch((error) => {
           console.log(error)
