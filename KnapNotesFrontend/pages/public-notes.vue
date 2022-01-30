@@ -16,16 +16,25 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-dialog v-model="preview" :width="cardWidth">
-      <v-card outlined class="pa-2">
-        <div class="note-preview">
-          {{ currentNoteText }}
-        </div>
-        <div class="buttons-container">
-          <v-btn @click="preview = false">
-            exit
+    <v-dialog
+      v-model="preview"
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >
+      <v-card>
+        <v-toolbar>
+          <v-toolbar-title>Preview</v-toolbar-title>
+          <v-spacer />
+          <v-btn icon @click="preview = false">
+            <v-icon>
+              mdi-close
+            </v-icon>
           </v-btn>
-        </div>
+        </v-toolbar>
+        <v-md-preview
+          :text="currentNoteText"
+        />
       </v-card>
     </v-dialog>
   </v-container>
@@ -45,19 +54,7 @@ export default {
   data () {
     return {
       preview: false,
-      currentNoteText: '',
-      widthsForBreakpoints: {
-        xs: 70,
-        sm: 50,
-        md: 40,
-        lg: 30,
-        xl: 30
-      }
-    }
-  },
-  computed: {
-    cardWidth () {
-      return this.widthsForBreakpoints[this.$vuetify.breakpoint.name] + '%'
+      currentNoteText: ''
     }
   },
   methods: {
@@ -77,14 +74,5 @@ export default {
 .note {
   height: 100%;
   overflow: hidden;
-}
-
-.buttons-container {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.note-preview {
-  height: 275px;
 }
 </style>

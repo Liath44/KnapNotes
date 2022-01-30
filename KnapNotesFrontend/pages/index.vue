@@ -39,20 +39,32 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-dialog v-model="editor" :width="cardWidth" persistent>
-      <v-card outlined class="pa-2">
-        <v-textarea v-model="currentNoteText" rows="10" auto-grow />
-        <div class="buttons-container">
-          <v-btn @click="editor = false">
-            exit
+    <v-dialog
+      v-model="editor"
+      fullscreen
+      hide-overlay
+      persistent
+      transition="dialog-bottom-transition"
+    >
+      <v-card>
+        <v-toolbar>
+          <v-toolbar-title>Edit</v-toolbar-title>
+          <v-spacer />
+          <v-btn icon @click="editor = false">
+            <v-icon>
+              mdi-close
+            </v-icon>
           </v-btn>
-          <v-btn v-if="currentNoteId ? !userNotes[currentNoteId].isEncrypted : false" @click="swapPrivacyStatusOfNote">
-            {{ userNotes[currentNoteId].isPublic ? "make private" : "make public" }}
-          </v-btn>
-          <v-btn @click="performSave">
-            save
-          </v-btn>
-        </div>
+        </v-toolbar>
+        <v-md-editor
+          v-model="currentNoteText"
+          :left-toolbar="leftToolbar"
+          :right-toolbar="rightToolbar"
+          :toolbar="toolbar"
+          height="calc(100vh - 64px)"
+          @save="performSave"
+          @swap-privacy="swapPrivacyStatusOfNote"
+        />
       </v-card>
     </v-dialog>
     <v-dialog v-model="passphraseDialog" :width="cardWidth">
@@ -132,6 +144,23 @@ export default {
   },
   data () {
     return {
+      rightToolbar: 'preview toc sync-scroll',
+      toolbar: {
+        makePublicToolbar: {
+          icon: 'v-md-icon-tip',
+          title: 'Make public',
+          action (editor) {
+            editor.$emit('swap-privacy')
+          }
+        },
+        makePrivateToolbar: {
+          icon: 'v-md-icon-tip',
+          title: 'Make private',
+          action (editor) {
+            editor.$emit('swap-privacy')
+          }
+        }
+      },
       currentNoteId: undefined,
       encryptedNoteId: undefined,
       currentNoteText: undefined,
@@ -153,6 +182,14 @@ export default {
   computed: {
     cardWidth () {
       return this.widthsForBreakpoints[this.$vuetify.breakpoint.name] + '%'
+    },
+    leftToolbar () {
+      if (!this.currentNoteId || this.userNotes[this.currentNoteId].isEncrypted) {
+        return 'undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code | save'
+      }
+      return this.userNotes[this.currentNoteId].isPublic
+        ? 'undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code | makePrivateToolbar save'
+        : 'undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code | makePublicToolbar save'
     }
   },
   methods: {
